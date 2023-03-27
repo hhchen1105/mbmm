@@ -118,8 +118,6 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     # normalize dataset for easier parameter selection
     #X = StandardScaler().fit_transform(X)
     X = scale(X)
-    # estimate bandwidth for mean shift
-    bandwidth = cluster.estimate_bandwidth(X, quantile=params['quantile'])
 
     # connectivity matrix for structured Ward
     connectivity = kneighbors_graph(
