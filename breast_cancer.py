@@ -1,6 +1,7 @@
 from sklearn import cluster, datasets, mixture
 import numpy as np
 import pandas as pd
+import os
 
 import MBMM
 from MBMM import MBMM
@@ -140,8 +141,15 @@ if __name__ == "__main__":
         else:
              print('2-dim data:')
                 
-        for name, algorithm in clustering_algorithms:
-            algorithm.fit(dataset)
+        for algo_name, algorithm in clustering_algorithms:
+            filename = 'models/{}-{}.pck'.format('breast_cancer', algo_name)
+            if os.path.exists(filename):
+                with open(filename, 'rb') as f:
+                    algorithm = pickle.load(f)
+            else:
+                algorithm.fit(dataset)
+                with open(filename, 'wb') as f:
+                    pickle.dump(algorithm, f)
 
             if hasattr(algorithm, 'labels_'):
                 train_predict_y = algorithm.labels_.astype(int)
@@ -156,4 +164,4 @@ if __name__ == "__main__":
 
             ami_value = np.round(metrics.adjusted_mutual_info_score(target, train_predict_y), 3)
                    
-            print(name, {'Accuracy':acc, 'ARI':ari_value, "AMI":ami_value})
+            print(algo_name, {'Accuracy':acc, 'ARI':ari_value, "AMI":ami_value})
