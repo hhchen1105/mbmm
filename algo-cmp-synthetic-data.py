@@ -130,9 +130,6 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     # ============
     two_means = cluster.MiniBatchKMeans(n_clusters=params['n_clusters'])
     dbscan = cluster.DBSCAN(eps=params['eps'])
-    optics = cluster.OPTICS(min_samples=params['min_samples'],
-                            xi=params['xi'],
-                            min_cluster_size=params['min_cluster_size'])
     average_linkage = cluster.AgglomerativeClustering(
         linkage="average", affinity="cityblock",
         n_clusters=params['n_clusters'], connectivity=connectivity)
@@ -146,7 +143,6 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
         ('KMeans', two_means),
         ('AC', average_linkage),
         ('DBSCAN', dbscan),
-        ('OPTICS', optics),
         ('GMM', gmm),
     )
 

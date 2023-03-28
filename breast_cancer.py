@@ -6,7 +6,7 @@ import MBMM
 from MBMM import MBMM
 
 import random
-from sklearn.cluster import KMeans, MeanShift, DBSCAN, AgglomerativeClustering, OPTICS
+from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.mixture import GaussianMixture
 from sklearn import metrics
 import warnings

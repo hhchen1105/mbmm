@@ -6,7 +6,7 @@ import MBMM
 from MBMM import MBMM
 
 import random
-from sklearn.cluster import KMeans, MeanShift, DBSCAN, AgglomerativeClustering, OPTICS
+from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.mixture import GaussianMixture
 from sklearn import metrics
 import warnings
@@ -132,9 +132,6 @@ if __name__ == "__main__":
     for i_dataset, (dataset, params) in enumerate(parameters):  
 
         kmeans = cluster.KMeans(n_clusters=params['n_clusters'])
-        bandwidth = cluster.estimate_bandwidth(dataset, quantile=params['quantile'])
-        #ms = cluster.MeanShift(bandwidth=bandwidth, bin_seeding=True)
-        optics = cluster.OPTICS()
         dbscan = cluster.DBSCAN(eps=params['eps'], min_samples=params['min_samples'])
         aggolmarative = cluster.AgglomerativeClustering(
             linkage=params['linkage'],
@@ -148,10 +145,8 @@ if __name__ == "__main__":
         clustering_algorithms = (
             ('MBMM', mbmm),
             ('K-means', kmeans),
-            #("MeanShift", ms),
             ("AgglomerativeClustering", aggolmarative),
             ("DBSCAN", dbscan),
-            ('OPTICS', optics),
             ('GMM', gmm),
         )
         
