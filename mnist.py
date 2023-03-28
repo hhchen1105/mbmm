@@ -1,6 +1,7 @@
 from sklearn import cluster, datasets, mixture
 import numpy as np
 import pandas as pd
+import os
 
 import MBMM
 from MBMM import MBMM
@@ -156,8 +157,15 @@ if __name__ == "__main__":
         if i_dataset == 1:
              print('number1 and 9:')
                 
-        for name, algorithm in clustering_algorithms:
-            algorithm.fit(dataset)
+        for algo_name, algorithm in clustering_algorithms:
+            filename = 'models/{}-{}.pck'.format('mnist', algo_name)
+            if os.path.exists(filename):
+                with open(filename, 'rb') as f:
+                    algorithm = pickle.load(f)
+            else:
+                algorithm.fit(dataset)
+                with open(filename, 'wb') as f:
+                    pickle.dump(algorithm, f)
 
             if hasattr(algorithm, 'labels_'):
                 train_predict_y = algorithm.labels_.astype(int)
@@ -172,4 +180,4 @@ if __name__ == "__main__":
 
             ami_value = np.round(metrics.adjusted_mutual_info_score(target[i_dataset], train_predict_y), 3)
                    
-            print(name, {'Accuracy':acc, 'ARI':ari_value, "AMI":ami_value})
+            print(algo_name, {'Accuracy':acc, 'ARI':ari_value, "AMI":ami_value})
