@@ -1,6 +1,5 @@
 import os
 import pickle
-import time
 import warnings
 
 import numpy as np
@@ -96,19 +95,19 @@ MBMM_init_para = [
 ]
 
 
-datasets = [
-    (blobs, {}),
+syn_datasets = [
+    (blobs, {}, 'blobs'),
     (varied, {'eps': .03, 'n_neighbors': 2,
-              'min_samples': 5, 'xi': 0.035, 'min_cluster_size': .2}),
+              'min_samples': 5, 'xi': 0.035, 'min_cluster_size': .2}, 'varied'),
     (aniso2, {'eps': .02, 'n_neighbors': 2,
-             'min_samples': 20, 'xi': 0.04, 'min_cluster_size': .2}),
+             'min_samples': 20, 'xi': 0.04, 'min_cluster_size': .2}, 'aniso2'),
     (noisy_circles, {'damping': .85, 'preference': -20,
                      'quantile': .2, 'n_clusters': 2,
-                     'min_samples': 20, 'xi': 0.25}),
-    (noisy_moons, {'damping': .86, 'preference': -6, 'n_clusters': 2}),
+                     'min_samples': 20, 'xi': 0.25}, 'noisy_circles'),
+    (noisy_moons, {'damping': .86, 'preference': -6, 'n_clusters': 2}, 'noisy_moons'),
 ]
 
-for i_dataset, (dataset, algo_params) in enumerate(datasets):
+for i_dataset, (dataset, algo_params, dataset_name) in enumerate(syn_datasets):
     # update parameters with dataset-specific values
     params = default_base.copy()
     params.update(algo_params)
@@ -146,33 +145,37 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
         ('GMM', gmm),
     )
 
-    for name, algorithm in clustering_algorithms:
-        t0 = time.time()
-
-        # catch warnings related to kneighbors_graph
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                message="the number of connected components of the " +
-                "connectivity matrix is [0-9]{1,2}" +
-                " > 1. Completing it to avoid stopping the tree early.",
-                category=UserWarning)
-            warnings.filterwarnings(
-                "ignore",
-                message="Graph is not fully connected, spectral embedding" +
-                " may not work as expected.",
-                category=UserWarning)
-            algorithm.fit(X)
-        t1 = time.time()
+    for algo_name, algorithm in clustering_algorithms:
+        filename = 'models/{}-{}.pck'.format(dataset_name, algo_name)
+        if os.path.exists(filename):
+            with open(filename, 'rb') as f:
+                algorithm = pickle.load(f)
+        else:
+            # catch warnings related to kneighbors_graph
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message="the number of connected components of the " +
+                    "connectivity matrix is [0-9]{1,2}" +
+                    " > 1. Completing it to avoid stopping the tree early.",
+                    category=UserWarning)
+                warnings.filterwarnings(
+                    "ignore",
+                    message="Graph is not fully connected, spectral embedding" +
+                    " may not work as expected.",
+                    category=UserWarning)
+                algorithm.fit(X)
+            with open(filename, 'wb') as f:
+                pickle.dump(algorithm, f)
 
         if hasattr(algorithm, 'labels_'):
             y_pred = algorithm.labels_.astype(int)
         else:
             y_pred = algorithm.predict(X)
 
-        plt.subplot(len(datasets), len(clustering_algorithms), plot_num)
+        plt.subplot(len(syn_datasets), len(clustering_algorithms), plot_num)
         if i_dataset == 0:
-            plt.title(name, size=30)
+            plt.title(algo_name, size=30)
 
         colors = np.array(list(islice(cycle(['#377eb8', '#ff7f00', '#4daf4a',
                                              '#f781bf', '#a65628', '#984ea3',
@@ -184,13 +187,8 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
 
         plt.xlim(0.0, 1.0)
         plt.ylim(0.0, 1.0)
-        #plt.xlim(-2.5, 2.5)
-        #plt.ylim(-2.5, 2.5)
         plt.xticks(())
         plt.yticks(())
-        #plt.text(.99, .01, ('%.2fs' % (t1 - t0)).lstrip('0'),
-        #         transform=plt.gca().transAxes, size=20,
-        #         horizontalalignment='right')
         plot_num += 1
 plt.savefig('visualize-cluster.pdf')
 
