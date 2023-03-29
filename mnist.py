@@ -1,6 +1,7 @@
 from sklearn import cluster, datasets, mixture
 import numpy as np
 import pandas as pd
+import pickle
 import os
 
 import MBMM
