@@ -190,5 +190,8 @@ for i_dataset, (dataset, algo_params, dataset_name) in enumerate(syn_datasets):
         plt.xticks(())
         plt.yticks(())
         plot_num += 1
-plt.savefig('visualize-cluster.pdf')
+figure_filename = "visualize-cluster.pdf"
+plt.savefig(figure_filename)
+print("Clustering results are saved in the file: '{}'".format(figure_filename))
+
 
