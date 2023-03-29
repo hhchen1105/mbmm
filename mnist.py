@@ -159,7 +159,7 @@ if __name__ == "__main__":
              print('number1 and 9:')
                 
         for algo_name, algorithm in clustering_algorithms:
-            filename = 'models/{}-{}.pck'.format('mnist', algo_name)
+            filename = 'models/{}-{}-{}.pck'.format('mnist', algo_name, i_dataset)
             if os.path.exists(filename):
                 with open(filename, 'rb') as f:
                     algorithm = pickle.load(f)
