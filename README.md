@@ -1,8 +1,6 @@
 # mbmm
 
-This repo contains the code for the multivariate beta mixture model (MBMM), a new probabilistic model for data clustering.  
-The flexible probability density function of the multivariate beta distribution suggests that the MBMM can adapt to diverse cluster shapes.  
-The MBMM can fit non-convex cluster shapes.
+This repo contains the code for the multivariate beta mixture model (MBMM), a new probabilistic model for data clustering.  The flexible probability density function of the multivariate beta distribution suggests that the MBMM can adapt to diverse cluster shapes.  The MBMM can fit non-convex cluster shapes.
 
 # Installation
 
