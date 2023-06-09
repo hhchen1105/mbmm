@@ -10,6 +10,7 @@ from MBMM import MBMM
 import random
 from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.mixture import GaussianMixture
+from scipy.optimize import linear_sum_assignment
 from sklearn import metrics
 import warnings
 
@@ -108,6 +109,20 @@ def initial_param(data, data_2d):
     return param
 
 
+def clustering_accuracy(y, yhat):
+    distinct_y = list(set(y))
+    distinct_yhat = list(set(yhat))
+    relabeled_y = [distinct_y.index(_) for _ in y]
+    relabeled_yhat = [distinct_yhat.index(_) for _ in yhat]
+
+    W = np.zeros((len(distinct_y), len(distinct_yhat)))
+    for i, j in zip(relabeled_y, relabeled_yhat):
+        W[i,j] += 1
+    M = W.max() - W
+    y_idx, yhat_idx = linear_sum_assignment(M)
+    return W[y_idx, yhat_idx].sum()/len(y)
+
+
 if __name__ == "__main__":
     data, data_2d, target = load_data()
                
@@ -157,9 +172,10 @@ if __name__ == "__main__":
             else:
                 train_predict_y = algorithm.predict(dataset)        
                 
-            cluster_labels = infer_cluster_labels(train_predict_y, target)
-            train_predicted_labels = infer_data_labels(train_predict_y, cluster_labels)       
-            acc = np.round(np.count_nonzero(target == train_predicted_labels)/len(target), 3)
+            #cluster_labels = infer_cluster_labels(train_predict_y, target)
+            #train_predicted_labels = infer_data_labels(train_predict_y, cluster_labels)
+            #acc = np.round(np.count_nonzero(target == train_predicted_labels)/len(target), 3)
+            acc = clustering_accuracy(target, train_predict_y)
 
             ari_value = np.round(metrics.adjusted_rand_score(target, train_predict_y), 3)
 
